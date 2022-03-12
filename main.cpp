@@ -16,7 +16,7 @@ enum class LinkType : char //underling type int : 0 per null, 1 per small, etc
     M, //medium
     B  //big
 
-}; //Struttura gerarchica collegamenti
+};  //Struttura gerarchica collegamenti
 
 class Building
 {
