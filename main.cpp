@@ -1,93 +1,8 @@
+#include "Building.h"
+#include "Link.h"
 #include <iostream>
 #include <array>
 #include <random>
-enum class BuildingType : char //underlying type int: 0 per H, 1 per S, 2 per C
-{
-    H, //houses
-    S, //sorting
-    C  //central
-};     //Struttura gerarchica edifici
-
-enum class LinkType : char //underling type int : 0 per null, 1 per small, etc
-{
-
-    N, //null
-    S, //small
-    M, //medium
-    B  //big
-
-};  //Struttura gerarchica collegamenti
-
-class Building
-{
-private:
-    BuildingType type_ = BuildingType::H;
-    double need_ = 0.0;
-    double entry_potential_ = 0.0; //settato a zero, perchè definito dalla dinamica
-
-public:
-    Building(BuildingType type, double need, double entry_potential) : type_{type}, need_{need}, entry_potential_{entry_potential}
-    {
-    }
-    Building() = default; //costruttore di default insieme alle condizioni uguali nel private
-    BuildingType GetType() const
-    {
-        return type_;
-    };
-    double GetNeed() const
-    {
-        return need_;
-    };
-    double GetEntryPotential() const
-    {
-
-        return entry_potential_;
-    };
-    void SetEntryPotential(double entry_potential)
-    {
-        entry_potential_ = entry_potential;
-    }
-    void SetNeed(double need)
-    {
-        need_ = need;
-    }
-    void SetType(BuildingType type)
-    {
-        type_ = type;
-    }
-};
-
-class Link
-{
-private:
-    LinkType type_;
-    static const int basic_load = 3; //carico massimo del link più piccolo
-    int max_load_ = basic_load * static_cast<int>(type_);
-    int load_;
-
-public:
-    Link(LinkType type, int max_load, int load) : type_{type}, max_load_{max_load}, load_{load} {}
-
-    LinkType GetType() const
-    {
-        return type_;
-    };
-    int GetMaxLoad() const
-    {
-        return max_load_;
-    };
-    int GetLoad() const
-    {
-
-        return load_;
-    };
-
-    void SetLoad(int newload)
-    {
-        load_ = newload;
-    };
-};
-
 int main()
 {
     int const N = 100;                               //N è numero di nodi, N^2-N il numero di link possibili
@@ -161,7 +76,5 @@ int main()
 
 //COMPITO: genera la natura dei nodi, inserendoli all'interno di un contenitore (array/ vec)
 //in modo da indicizzarli e facilitare la caratterizzazione del link che li connette
-
-
 
 
