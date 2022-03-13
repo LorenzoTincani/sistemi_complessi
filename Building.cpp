@@ -27,3 +27,5 @@ void Building::SetType(BuildingType type)
 {
     type_ = type;
 }
+
+//sus.eseguibile
