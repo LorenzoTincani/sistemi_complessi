@@ -9,6 +9,7 @@ int main() //le modifiche vanno sus
     std::array<std::array<int, N>, N> adj_matrix{0}; //matrice di adiacenza, con int come pesi
     std::array<Building, N> nodes;
     double Total_potential = 0.0;
+    int nofSorting =0;
 
     std::random_device rd; //   seed
     std::default_random_engine gen(rd());
@@ -30,6 +31,9 @@ int main() //le modifiche vanno sus
         else if (numtype == 1)
         {
             nodes[k].SetType(BuildingType::S);
+            nofSorting++;
+            
+            
             //std::cout<<"sorting "<<nodes[k].GetNeed()<<std::endl;
         }
 
@@ -54,53 +58,53 @@ int main() //le modifiche vanno sus
             BuildingType node_j = nodes[j].GetType();
             if (i == j)
             {
-
                 adj_matrix[i][j] = 0;
             }
             else
             {
                 if (node_i == BuildingType::H && node_j == BuildingType::H)
                 { //casa-casa
-                    if (rnd <= 10)
+                    if (rnd <= 0.05)//si suppone che, su 100 case, una casa sia collegata con altre 5. 
                     {
-                        adj_matrix[i][j] = 0;
+                        adj_matrix[i][j] = 1;
                     }
                     else
                     {
-                        adj_matrix[i][j] = 9;
+                        adj_matrix[i][j] = 0;  //link small
                     }
                 }
                 else if (node_i == BuildingType::H && node_j == BuildingType::S)
                 { //casa-smistamento
-                    if (rnd <=10)
+                    if (rnd <=(1/nofSorting)) //si suppone che la probabilità di avere questo link sia 1/# smistamento
                     {
-                        adj_matrix[i][j] = 0;
+                        adj_matrix[i][j] = 1;//Sempre 1 perchè l'energia che confluisce è sempre la medesima 
                     }
                     else
                     {
-                        adj_matrix[i][j] = 9;
+                        adj_matrix[i][j] = 0; // link medium
                     }
                 }
                 else if (node_i == BuildingType::S && node_j == BuildingType::S)
                 { //smistamento-smistamento
-                    if (rnd <=10)
+                    if (rnd <=0.01)
                     {
-                        adj_matrix[i][j] = 0;
+                        adj_matrix[i][j] = 2;
                     }
                     else
                     {
-                        adj_matrix[i][j] = 9;
+                        adj_matrix[i][j] = 0;
                     }
                 }
                 else
                 { //smistamento- centrale
+                //DA FARE. 
                     if (rnd <=10)
                     {
-                        adj_matrix[i][j] = 0;
+                        adj_matrix[i][j] = 3;
                     }
                     else
                     {
-                        adj_matrix[i][j] = 9;
+                        adj_matrix[i][j] = 0;
                     }
                 }
             }
