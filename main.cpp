@@ -7,7 +7,6 @@
 #include <iomanip>
 int main() //le modifiche vanno sus
 {
-    std::cout << "riga 9 \n";
     int const N = 30;                                //N è numero di nodi, N^2-N il numero di link possibili
     std::array<std::array<int, N>, N> adj_matrix{0}; //matrice di adiacenza, con int come pesi
     std::array<Building, N> nodes;
@@ -15,6 +14,10 @@ int main() //le modifiche vanno sus
     int nofSorting = 0;
     int nofCentral = 0;
     int nofHouse = 0;
+    int nofBiglink=0;
+    int nofSmalllink=0;
+    int nofMediumlink=0;
+
     std::random_device rd; //   seed
     std::default_random_engine gen(rd());
     //std::discrete_distribution<int> link_dist({4, 3, 2, 1}); // parametri tra 0 e 3, per tre link più link non esistente
@@ -22,7 +25,7 @@ int main() //le modifiche vanno sus
     std::discrete_distribution<int> nodeType_dist({10, 3, 1});
     std::normal_distribution<double> needfluct_dist(0.0, 0.33); //distribuzione guassiana di fluttuazioni nella richiesta di energia delle case
     std::uniform_real_distribution<double> link_dist(0.0, 1.0); //distribuzione uniforme per distribuzione dei link, generato come proporzioni programma arcelli
-    std::cout << "riga 24 \n";
+
     for (int k = 0; k < N; ++k) //settaggio dei nodi
     {
         int numtype = nodeType_dist(gen); //numtype = type of node
@@ -51,13 +54,16 @@ int main() //le modifiche vanno sus
             nofCentral++;
         }
     }
-    std::cout << "riga 59 \n";
-    int j = 0; //j è fuori per poter calcolare solo il triangolo superiore della matrice dato che è simmetrica
+ 
     std::cout<<"nofcentral: "<<nofCentral<<std::endl;
     std::cout<<"nofHouse: "<<nofHouse<<std::endl;
-    std::cout<<"nofSorting: "<<nofSorting<<std::endl;
+    std::cout<<"nofSorting: "<<nofSorting<<std::endl; 
+    int j = 0; //j è fuori per poter calcolare solo il triangolo superiore della matrice dato che è simmetrica
+    int counter=0;
+    
     for (int i = 0; i < N; ++i)
     {
+    
         BuildingType node_i = nodes[i].GetType();
 
         //DA GENERARE MATRICE DI ADIACENZA, CONTROLLANDO LA NATURA DEI VARI NODI.
@@ -73,9 +79,10 @@ int main() //le modifiche vanno sus
             {
                 if (node_i == BuildingType::H && node_j == BuildingType::H)
                 {                    //casa-casa
-                    if (rnd <= 0.05) //si suppone che, su 100 case, una casa sia collegata con altre 5.
+                    if (rnd <= 0.10) //si suppone che, su 100 case, una casa sia collegata con altre 5.
                     {
                         adj_matrix[i][j] = 1; //link small
+                        nofSmalllink++;
                     }
                 
                 }
@@ -84,14 +91,16 @@ int main() //le modifiche vanno sus
                     if (rnd <= (1 / nofSorting)) //si suppone che la probabilità di avere questo link sia 1/# smistamento
                     {
                         adj_matrix[i][j] = 1; //Sempre 1 perchè l'energia che confluisce è sempre la medesima
-                    } //link medium
+                        nofSmalllink++;
+                    } //link small
                 
                 }
                 else if (node_i == BuildingType::S && node_j == BuildingType::S)
                 { //smistamento-smistamento
-                    if (rnd <= 0.01)
+                    if (rnd <= 0.10)
                     {
                         adj_matrix[i][j] = 2;
+                        nofMediumlink++;
                     }
                 
                 }
@@ -107,6 +116,7 @@ int main() //le modifiche vanno sus
                        {
                             adj_matrix[i][j] = 3;
                             p = true;
+                            nofBiglink++;
                         }
                         z=z-rn;
                     
@@ -114,8 +124,8 @@ int main() //le modifiche vanno sus
                 }
             }
         }
-        j = j - N;
-        j++;
+        counter++;
+        j = counter;
     }
     std::cout << "riga 124 \n";
     for (int i = 0; i < N; i++)
@@ -124,24 +134,28 @@ int main() //le modifiche vanno sus
         {
             if (adj_matrix[i][k] == 0)
             {
-                printf("\033[33m0");
+                printf("\033[33m0 ");
             }
             else if (adj_matrix[i][k] == 1)
             {
                 //std::cout << "       ";
-                printf("\033[31m1");
+                printf("\033[31m1 ");  
             }
             else if (adj_matrix[i][k] == 2)
             {
                 //std::cout << "       ";
-                printf("\033[32m2");
+                printf("\033[32m2 ");
             }
             else if (adj_matrix[i][k] == 3)
             {
                 // std::cout << "       ";
-                printf("\033[36m3");
+                printf("\033[36m3 ");
             }
         }
         std::cout << std::endl;
+        
     }
+    std::cout <<"nofSmalllink :"<<nofSmalllink <<"\n";
+    std::cout <<"nofMediumlink :"<< nofMediumlink<<"\n";
+    std::cout <<"nofBiglink :"<< nofBiglink<<"\n";
 }
