@@ -125,6 +125,8 @@ int main() //le modifiche vanno sus
                         }
                         z = z - rn;
                     }
+
+
                 }
             }
         }
