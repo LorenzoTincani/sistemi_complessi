@@ -7,16 +7,17 @@
 #include <iomanip>
 int main() //le modifiche vanno sus
 {
-    int const N = 30;                                //N è numero di nodi, N^2-N il numero di link possibili
+    int const N = 40;                                //N è numero di nodi, N^2-N il numero di link possibili
     std::array<std::array<int, N>, N> adj_matrix{0}; //matrice di adiacenza, con int come pesi
     std::array<Building, N> nodes;
     double Total_potential = 0.0;
     int nofSorting = 0;
     int nofCentral = 0;
     int nofHouse = 0;
-    int nofBiglink=0;
-    int nofSmalllink=0;
-    int nofMediumlink=0;
+    int nofBiglink = 0;
+    int nofSmalllink = 0;
+    int nofHSLink = 0;
+    int nofMediumlink = 0;
 
     std::random_device rd; //   seed
     std::default_random_engine gen(rd());
@@ -54,16 +55,18 @@ int main() //le modifiche vanno sus
             nofCentral++;
         }
     }
- 
-    std::cout<<"nofcentral: "<<nofCentral<<std::endl;
-    std::cout<<"nofHouse: "<<nofHouse<<std::endl;
-    std::cout<<"nofSorting: "<<nofSorting<<std::endl; 
+
+    std::cout << "nofcentral: " << nofCentral << std::endl;
+    std::cout << "nofHouse: " << nofHouse << std::endl;
+    std::cout << "nofSorting: " << nofSorting << std::endl;
     int j = 0; //j è fuori per poter calcolare solo il triangolo superiore della matrice dato che è simmetrica
-    int counter=0;
-    
+    int counter = 0;
+
     for (int i = 0; i < N; ++i)
     {
-    
+        int y = 0;
+        int pi = 0;
+
         BuildingType node_i = nodes[i].GetType();
 
         //DA GENERARE MATRICE DI ADIACENZA, CONTROLLANDO LA NATURA DEI VARI NODI.
@@ -79,21 +82,21 @@ int main() //le modifiche vanno sus
             {
                 if (node_i == BuildingType::H && node_j == BuildingType::H)
                 {                    //casa-casa
-                    if (rnd <= 0.10) //si suppone che, su 100 case, una casa sia collegata con altre 5.
+                    if (rnd <= 0.30) //si suppone che, su 100 case, una casa sia collegata con altre 10.
                     {
                         adj_matrix[i][j] = 1; //link small
                         nofSmalllink++;
+                        y++;
                     }
-                
                 }
                 else if (node_i == BuildingType::H && node_j == BuildingType::S)
-                {                                //casa-smistamento
-                    if (rnd <= (1 / nofSorting)) //si suppone che la probabilità di avere questo link sia 1/# smistamento
+                { //casa-smistamento
+                    //if (rnd <= (1 / nofSorting)) //si suppone che la probabilità di avere questo link sia 1/# smistamento
+                    if (rnd <= 0.20)
                     {
-                        adj_matrix[i][j] = 1; //Sempre 1 perchè l'energia che confluisce è sempre la medesima
-                        nofSmalllink++;
+                        adj_matrix[i][j] = 4; //Sempre 1 perchè l'energia che confluisce è sempre la medesima
+                        nofHSLink++;
                     } //link small
-                
                 }
                 else if (node_i == BuildingType::S && node_j == BuildingType::S)
                 { //smistamento-smistamento
@@ -102,32 +105,40 @@ int main() //le modifiche vanno sus
                         adj_matrix[i][j] = 2;
                         nofMediumlink++;
                     }
-                
                 }
                 else
                 { //smistamento- centrale
                     bool p = false;
-                     float probCentral = 1 / nofCentral;
-                    double z=1;
-                   while(p==false){
+                    float probCentral = 1 / (nofCentral * 2);
+                    double z = 1;
+                    while (p == false)
+                    {
 
-                        double rn= link_dist(gen);
-                        if (z<= probCentral)
-                       {
+                        double rn = link_dist(gen);
+                        if (z <= probCentral)
+                        {
                             adj_matrix[i][j] = 3;
                             p = true;
                             nofBiglink++;
+
+                            pi++;
                         }
-                        z=z-rn;
-                    
-                 }
+                        z = z - rn;
+                    }
                 }
             }
         }
         counter++;
         j = counter;
+        if (node_i == BuildingType::H)
+        {
+            std::cout << "Numero di case con cui è collegata la casa " << i << "esima: " << y << "\n";
+        }
+        else
+            continue;
+        std::cout << "Numero di centrali con cui è collegato lo smistamento " << i << "esima: " << pi << "\n";
     }
-    std::cout << "riga 124 \n";
+
     for (int i = 0; i < N; i++)
     {
         for (int k = 0; k < N; k++)
@@ -139,7 +150,7 @@ int main() //le modifiche vanno sus
             else if (adj_matrix[i][k] == 1)
             {
                 //std::cout << "       ";
-                printf("\033[31m1 ");  
+                printf("\033[31m1 ");
             }
             else if (adj_matrix[i][k] == 2)
             {
@@ -151,11 +162,17 @@ int main() //le modifiche vanno sus
                 // std::cout << "       ";
                 printf("\033[36m3 ");
             }
+            else
+                printf("\033[37m4 ");
         }
         std::cout << std::endl;
-        
     }
-    std::cout <<"nofSmalllink :"<<nofSmalllink <<"\n";
-    std::cout <<"nofMediumlink :"<< nofMediumlink<<"\n";
-    std::cout <<"nofBiglink :"<< nofBiglink<<"\n";
+    std::cout << "nofSmalllink :" << nofSmalllink << "\n";
+    std::cout << "nofHouseSortingLink: " << nofHSLink << "\n";
+    std::cout << "nofMediumlink :" << nofMediumlink << "\n";
+    std::cout << "nofBiglink :" << nofBiglink << "\n";
 }
+
+//Nota: Sarebbe meglio differenziare i link casa-casa, casa-smistamento. Non tanto per una questione di portata energetica, quanto per differenziarli.
+//E' diverso colpire uno dei due link a livello di danni.
+//Mettere controllo per avere per avere sicurezza che almeno una casa sia collegata ad uno smistamento
