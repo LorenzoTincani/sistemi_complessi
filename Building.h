@@ -22,5 +22,5 @@ public:
     void SetEntryPotential(double entry_potential);
     void SetNeed(double need);
     void SetType(BuildingType type);
-};
+};      
 #endif
